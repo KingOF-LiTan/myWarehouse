@@ -145,20 +145,67 @@ int main(){
     return 0;
 }
 ```
+####vector的简单介绍
+在容器中，向量也是一维的存储形式，可以理解为长度可变的动态数组
+在尾部增删的效率高，并且拥有很高的访问效率
+vector 可以嵌套使用
+如
+```
+#include <iostream> 
+#include <vector> 
+using namespace std;
+// 程序的主函数
+int main()
+{
+	vector<vector<int>> V;
+	vector<int> sub_V;
+	sub_V.push_back(1);
+	sub_V.push_back(2);
+	sub_V.push_back(1);
+	V.push_back(sub_V);
+	cout << V[0][1] << endl;
+	system("pause");
+	return 0;
+}	
 
-#### 参与贡献
+```
+相当于将subv插入到v的尾部，形成一个二维数组
+这是一些在vector中常见的操作
+```
+    int size = vec1.size();         //元素个数
+ 
+    bool isEmpty = vec1.empty();    //判断是否为空
+ 
+    vec1.insert(vec1.end(),5,3);    //从vec1.back位置插入5个值为3的元素
+ 
+    vec1.pop_back();              //删除末尾元素
+ 
+    vec1.erase(vec1.begin(),vec1.end());//删除之间的元素，其他元素前移
+ 
+    cout<<(vec1==vec2)?true:false;  //判断是否相等==、！=、>=、<=...
+ 
+    vector<int>::iterator iter = vec1.begin();    //获取迭代器首地址
+ 
+    vector<int>::const_iterator c_iter = vec1.begin();   //获取const类型迭代器
+ 
+    vec1.clear();                 //清空元素
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+```
+c++赋予了其迭代器的用法
+iterator 
+例如
+ ```
+    vector<int> V;
+    V.push_back(1);
+	V.push_back(2);
+	V.push_back(3);
+	for(vector<int>::iterator it=v.begin();it!=v.end();it++)
+	cout<<*it<<
+ ```
+ 可知迭代器要用相同的数据结构初始化
+ it是迭代器指针
+
+ ####string
+ 和vector十分相似的容器，和c的string区别不是很大，
 
 
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)

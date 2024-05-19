@@ -15,10 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="150逆波兰表达式.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="347前k个高频元素.cpp">
+    <ClCompile Include="map练习.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
