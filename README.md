@@ -71,11 +71,80 @@ int main()
 }
 ```
 
-#### 使用说明
+#### MAP
+map是stl的一个关联容器
+what is 关联容器？
+在C++中，关联容器是一类容器，它们能够通过键来存储和访问元素，提供了快速的数据检索功能。这些容器通常基于平衡二叉树、哈希表或其他高效的数据结构实现。
+C++ STL（标准模板库）提供了以下几种关联容器：
+set：存储唯一元素的集合，元素按照升序排列。
+multiset：可以存储重复元素的集合，元素同样按照升序排列。
+map：使用键值对存储数据，每个键都是唯一的，并且按照升序排列。
+multimap：允许有重复的键，每个键可以对应多个值，键值对按照升序排列。
+unordered_set：基于哈希表实现的集合，不保证元素顺序，提供平均常数时间复杂度的成员检查。
+unordered_multiset：类似于 unordered_set，但允许有重复元素。
+unordered_map：基于哈希表实现的键值对映射，不保证元素顺序，提供平均常数时间复杂度的成员检查。
+unordered_multimap：类似于 unordered_map，但允许有重复的键。
+map和hash的关系密不可分
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+map定义 map<类型,类型> m;
+第一个是关键字 即键 key 第二个即值value
+和python中的容器大同小异 可以类比字典？
+例子
+```
+#include<map>
+#include<iostream>
+using namespace std;
+int main()
+{
+	map<string,string> m;
+	m["张三"]="吃汉堡";
+	cout<<"张三: "<<m["张三"]; 
+}
+```
+每个键有唯一对应的值
+例子：
+离散化基础
+输入：
+
+5
+8 2 6 9 2
+
+输出：
+
+3 1 2 4 1
+输出每个数的排名
+这题可以用sort和map做
+```
+#include<bits/stdc++.h>
+using namespace std;
+int N,a[100001],b[100001];
+map<int,int> m;
+int main(){
+    
+    cin>>N;
+    for(int i=0;i<N;i++)
+    {
+        cin>>a[i];
+        b[i]=a[i];
+    }
+    sort(b,b+N);//将数组排序
+    int c=1;//排名
+    m[b[0]]=1;//因为数组经过排序，所以第1个元素肯定是第一
+    for(int i=1;i<N;i++)
+    {
+        if(b[i]!=b[i-1])//判断是否不与前一个数相等
+        {
+            c++;
+            m[b[i]]=c;
+        }
+    }
+    for(int i=0;i<N;i++)
+        if(m[a[i]]!=0)
+            cout<<m[a[i]]<<" ";//按照原来的下标输出
+    
+    return 0;
+}
+```
 
 #### 参与贡献
 
