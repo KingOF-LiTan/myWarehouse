@@ -21,7 +21,7 @@ void sort(要排序元素的起始地址，要排序元素的结束地址，比较函数)；
 之前蓝桥杯就忘记快排怎么用了。。。
 比较函数可以缺省，默认从小到大
 
-#####CMP快排
+####CMP快排
 比较函数我们可以自己自定义
 ```
 #include<algorithm>
@@ -39,6 +39,35 @@ int main()
 	for(int i=0;i<6;i++)
 		cout<<a[i]<<" ";
 		
+}
+```
+####CMP与结构体
+同学们比赛吃饭，参赛队员分别为“法外狂徒张三”，“干饭者老八”以及王五同学，谁吃的更多谁就排在更前面，如果吃的一样多那么谁吃的老八汉堡多谁就排在更前面：
+```
+#include<algorithm>
+#include<iostream>
+using namespace std;
+struct ganfan
+{
+	string name;
+	int zongshu;
+	int hanbao;
+};
+bool cmp(ganfan x,ganfan y)
+{
+	if(x.zongshu>y.zongshu)return true;
+	else if(x.hanbao>y.hanbao&&x.zongshu==y.zongshu)//如果一样多那么比谁吃的汉堡多
+	return false;
+}
+int main()
+{
+	ganfan a[3];
+	a[0].name="zhangsan";a[0].zongshu=200;a[0].hanbao=6;
+	a[1].name="laoba";a[1].zongshu=170;a[1].hanbao=13;
+	a[2].name="wangwu";a[2].zongshu=170;a[2].hanbao=10;
+	sort(a,a+3,cmp);
+	for(int i=0;i<3;i++)
+		cout<<a[i].name<<" ";
 }
 ```
 
