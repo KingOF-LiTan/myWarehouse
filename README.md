@@ -3,8 +3,12 @@
 #### 介绍	
 stl库里面有许多有用的别人写完的函数 例如快排
 
-#### 软件架构
-软件架构说明
+
+#### STL是啥东西？
+STL,学名Standard Template Library，一般我们称他为标准模板库
+从根本上说，STL是一些“容器”的集合，这些“容器”有list,vector,set,map一大堆，STL也是算
+法和其他一些组件的集合。比如说<algorithm>中sort函数、<string>中string类都
+是STL的内容。
 
 
 #### 安装教程
