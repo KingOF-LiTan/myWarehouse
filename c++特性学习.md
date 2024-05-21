@@ -184,3 +184,174 @@ public:
 };
 // 用构造的类创建对象，print此时就是一个函数对象
 auto print = print_class();
+
+
+
+####std::function and std::bind 结构化
+
+function和bind 在c++中对于回调函数进行统一的调用和封装
+首先，c++中的可调用函数有自定义函数，lambda表达式， 函数指针，bind对象，函数对象
+
+函数指针是由函数参数和返回类型决定的
+关于函数指针的例子
+```
+# include <iostream>
+
+int fun(int x, int y) {                         //被调用的函数
+    std::cout << x + y << std::endl;
+	return x + y;
+}
+
+int fun1(int (*fp)(int, int), int x, int y) {   //形参为函数指针
+	return fp(x, y);
+}
+
+typedef int (*Ftype)(int, int);                 //定义一个函数指针类型Ftype
+int fun2(Ftype fp, int x, int y) { 
+	return fp(x, y);
+}
+
+int main(){
+	fun1(fun, 100, 100);                          //函数fun1调用函数fun
+	fun2(fun, 200, 200);                          //函数fun2调用函数fun
+}
+
+
+```
+可以看出函数可以作为一个参数传入另一个函数的参数
+
+lambda表达式。。略，总之就是产生了一个匿名对象的调用，可以保证安全性
+
+函数对象：重载了函数调用运算符（）的对象就是函数对象
+
+可调用对象的定义方式很多但是函数的调用都很相似，需要一个统一的方式来保存可调用对象
+于是std::function就出现了
+std::function是一个可调用对象包装器，是一个类模板，可以容纳除了类成员函数指针之外的所有可调用对象，
+它可以用统一的方式处理函数、函数对象、函数指针，并允许保存和延迟它们的执行。
+定义std：：function
+```
+#include <functional>
+std::function<type>
+
+```
+例如
+```
+# include <iostream>
+# include <functional>
+
+typedef std::function<int(int, int)> comfun;//定义了一个类型为 int（int，int）的comfun 模板
+
+// 普通函数
+int add(int a, int b) { return a + b; }
+
+// lambda表达式
+auto mod = [](int a, int b){ return a % b; };
+
+// 函数对象类
+struct divide{
+    int operator()(int denominator, int divisor){
+        return denominator/divisor;
+    }
+};
+
+int main(){
+	comfun a = add;
+	comfun b = mod;
+	comfun c = divide();
+    std::cout << a(5, 3) << std::endl;
+    std::cout << b(5, 3) << std::endl;
+    std::cout << c(5, 3) << std::endl;
+}
+
+
+```
+//comfun 被定义为模板类 相当于创建了一个a对象，将add函数和divide类寄存进去
+简化了函数的调用
+
+
+####std::bind
+bind 是一个通用函数的适配器，通过接受一个可调用的函数对象，生成一个新的可调用对象来适应原参数列表
+bind顾名思义是绑定的意思，可以将函数和参数列表绑定，然后再用function保存
+
+bind的调用
+
+auto newfuntion = bind(function,argc_list)
+//该表达式意为 调用newfunction时，会调用function并且传递argc_list中的参数
+
+具体使用代码
+```
+#include <iostream>
+#include <functional>
+
+class A {
+public:
+    void fun_3(int k,int m) {
+        std::cout << "print: k = "<< k << ", m = " << m << std::endl;
+    }
+};
+
+void fun_1(int x,int y,int z) {
+    std::cout << "print: x = " << x << ", y = " << y << ", z = " << z << std::endl;
+}
+
+void fun_2(int &a,int &b) {
+    ++a;
+    ++b;
+    std::cout << "print: a = " << a << ", b = " << b << std::endl;
+}
+
+int main(int argc, char * argv[]) {
+    //f1的类型为 function<void(int, int, int)>
+    auto f1 = std::bind(fun_1, 1, 2, 3); 					//表示绑定函数 fun 的第一，二，三个参数值为： 1 2 3
+    f1(); 													//print: x=1,y=2,z=3
+
+    auto f2 = std::bind(fun_1, std::placeholders::_1, std::placeholders::_2, 3);
+    //表示绑定函数 fun 的第三个参数为 3，而fun 的第一，二个参数分别由调用 f2 的第一，二个参数指定
+    f2(1, 2);												//print: x=1,y=2,z=3
+ 
+    auto f3 = std::bind(fun_1, std::placeholders::_2, std::placeholders::_1, 3);
+    //表示绑定函数 fun 的第三个参数为 3，而fun 的第一，二个参数分别由调用 f3 的第二，一个参数指定
+    //注意： f2  和  f3 的区别。
+    f3(1, 2);												//print: x=2,y=1,z=3
+
+    int m = 2;
+    int n = 3;
+    auto f4 = std::bind(fun_2, std::placeholders::_1, n); //表示绑定fun_2的第一个参数为n, fun_2的第二个参数由调用f4的第一个参数（_1）指定。
+    f4(m); 													//print: a=3,b=4
+    std::cout << "m = " << m << std::endl;					//m=3  说明：bind对于不事先绑定的参数，通过std::placeholders传递的参数是通过引用传递的,如m
+    std::cout << "n = " << n << std::endl;					//n=3  说明：bind对于预先绑定的函数参数是通过值传递的，如n
+    
+    A a;
+    //f5的类型为 function<void(int, int)>
+    auto f5 = std::bind(&A::fun_3, &a, std::placeholders::_1, std::placeholders::_2); //使用auto关键字
+    f5(10, 20);												//调用a.fun_3(10,20),print: k=10,m=20
+
+    std::function<void(int,int)> fc = std::bind(&A::fun_3, a,std::placeholders::_1,std::placeholders::_2);
+    fc(10, 20);   											//调用a.fun_3(10,20) print: k=10,m=20 
+
+    return 0; 
+}
+std::placeholders::_1 是 C++ 标准库中的一个占位符（placeholder），用于 std::bind 函数模板。占位符允许你在绑定一个函数或成员函数时，延迟指定某些参数，直到实际调用时再传递这些参数。
+ auto f2 = std::bind(fun_1, std::placeholders::_1, std::placeholders::_2, 3);
+    //表示绑定函数 fun 的第三个参数为 3，而fun 的第一，二个参数分别由调用 f2 的第一，二个参数指定
+    f2(1, 2);												//print: x=1,y=2,z=3
+std::placehoulders是一个对象，允许你在调用时延时传入参数，这里就可以在调用时使用f2(1,2),而不是f2()
+    auto f3 = std::bind(fun_1, std::placeholders::_2, std::placeholders::_1, 3);
+    //表示绑定函数 fun 的第三个参数为 3，而fun 的第一，二个参数分别由调用 f3 的第二，一个参数指定
+    //注意： f2  和  f3 的区别。
+    f3(1, 2);												//print: x=2,y=1,z=3
+中 std::placeholder::1和2是不一样的
+```
+ int m = 2;
+    int n = 3;
+    auto f4 = std::bind(fun_2, std::placeholders::_1, n); //表示绑定fun_2的第一个参数为n, fun_2的第二个参数由调用f4的第一个参数（_1）指定。
+    f4(m); 													//print: a=3,b=4
+    std::cout << "m = " << m << std::endl;					//m=3  说明：bind对于不事先绑定的参数，通过std::placeholders传递的参数是通过引用传递的,如m
+    std::cout << "n = " << n << std::endl;					//n=3  说明：bind对于预先绑定的函数参数是通过值传递的，如n
+
+    bind对于placeholder：：采用引用传递，对于a，bc之类的是通过值传递的
+
+
+    为什么 auto f5 = std::bind(&A::fun_3, &a, std::placeholders::_1, std::placeholders::_2);要有&a？
+    在C++中，当你使用 std::bind 绑定一个成员函数时，需要传递一个对象的指针或引用，因为成员函数必须通过对象调用。成员函数和普通函数不同，它们依赖于特定的对象实例，这样才能访问对象的成员数据和其他成员函数
+    所以在使用bind需要实例化
