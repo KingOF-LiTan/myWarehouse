@@ -123,3 +123,64 @@ void f2() {
 
 如果程序不需要多个指向同一个对象的指针，则可使用 unique_ptr。如果函数使用 new 分配内存，并返还指向该内存的指针，
 将其返回类型声明为 unique_ptr 是不错的选择。这样，所有权转让给接受返回值的 unique_ptr，而该智能指针将负责调用 delete。
+
+####lambda 
+
+在python和c++中可以见到lambda表达式，一脸懵逼啊
+先介绍c++中的lambda表达式
+格式：
+[捕获列表](参数列表) -> 返回类型 { 函数体 }
+实例
+```
+auto add = [](int a, int b) -> int { return a + b; };
+int result = add(2, 3);  // result为5
+
+```
+lambda表达式，也称为lambda函数是在调用或作为函数参数传递的位置处定义匿名函数对象的便捷方法
+
+实例2
+```
+#include <algorithm>
+#include <cmath>
+
+void abssort(float* x, unsigned n) {
+    std::sort(x, x + n,
+        // Lambda expression begins
+        [](float a, float b) {
+            return (std::abs(a) < std::abs(b));
+        } // end of lambda expression
+    );
+}
+
+```
+这个例子中，sort的第三个参数应该是排序函数，但是通过lambda表达式，直接将排序函数的函数体定义在里面，对于不需要复用且比较小的函数，这种写法很好
+在python中 lambda更简单 
+例如
+add = lambda a,b: a+ b 前面是参数名，后面是表达式
+
+Lambda表达式的优点
+可以直接在需要调用函数的位置定义短小精悍的函数，而不需要预先定义好函数
+std::find_if(v.begin(), v.end(), [](int& item){return item > 2});
+1
+使用Lamdba表达式变得更加紧凑，结构层次更加明显、代码可读性更好
+Lambda表达式的缺点
+Lamdba表达式语法比较灵活，增加了阅读代码的难度
+对于函数复用无能为力
+
+Lambda表达式工作原理
+编译器会把一个Lambda表达式生成一个匿名类的匿名对象，并在类中重载函数调用运算符，实现了一个operator()方法。
+
+auto print = []{cout << "Hello World!" << endl; };
+1
+编译器会把上面这一句翻译为下面的代码：
+
+class print_class
+{
+public:
+	void operator()(void) const
+	{
+		cout << "Hello World!" << endl;
+	}
+};
+// 用构造的类创建对象，print此时就是一个函数对象
+auto print = print_class();
